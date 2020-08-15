@@ -1,40 +1,26 @@
 package main
 
 import (
-    "fmt"
     "log"
     "net/http"
-    "encoding/json"
-    userReps "go-playpen/users-representations"
-    restReps "go-playpen/rest-representations"
+    "go-playpen/users-service/constants"
+    "go-playpen/users-service/controller"
 )
 
-var Users []userReps.User
-
-func root(w http.ResponseWriter, r *http.Request) {
-    links := []restReps.Link {
-        restReps.Link{Rel: "getUsers", Method: http.MethodGet, Uri: "/users"},
-    }
-    api := restReps.Api{Links: links}
-    json.NewEncoder(w).Encode(api)
-    fmt.Println("Endpoint Hit: API Root")
+// Define the endpoint handlers
+func addHandlers() {
+    http.HandleFunc(constants.RootUri + "/", controller.GetRoot)
+    http.HandleFunc(constants.GetUsersUri + "/", controller.GetUsers)
 }
 
-func getUsers(w http.ResponseWriter, r *http.Request) {
-    fmt.Println("Endpoint Hit: Users List")
-    json.NewEncoder(w).Encode(Users)
-}
-
-func handleRequests() {
-    http.HandleFunc("/", root)
-    http.HandleFunc("/users", getUsers)
+// Start listening and serving requests
+func start() {
     log.Fatal(http.ListenAndServe(":10001", nil))
 }
 
+// Start the service
 func main() {
-    Users = []userReps.User {
-        userReps.User{FirstName: "Nathan", LastName: "Asselstine"},
-    }
-    handleRequests()
+    addHandlers()
+    start()
 }
 
